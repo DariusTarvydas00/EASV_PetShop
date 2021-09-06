@@ -1,8 +1,8 @@
 ﻿
+using ClassLibrary1Infrastructure.Repositories;
 using EASV_PetShop.Core.ApplicationService;
 using EASV_PetShop.Core.ApplicationService.Services;
 using EASV_PetShop.Core.DomainService;
-using EASV_PetShop.Infrastructure.Static.Data.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EASV_PetShop.UI
@@ -14,6 +14,13 @@ namespace EASV_PetShop.UI
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddScoped<ICustomerRepository, CustomerRepository>();
             serviceCollection.AddScoped<ICustomerService, CustomerService>();
+            
+            serviceCollection.AddScoped<IPetRepository, PetRepository>();
+            serviceCollection.AddScoped<IPetService, PetService>();
+
+            serviceCollection.AddScoped<IPetTypeRepository, PetTypeRepository>();
+            serviceCollection.AddScoped<IPetTypeService, PetTypeService>();
+            
             serviceCollection.AddScoped<IPrinter, Printer>();
             
             var serviceProvider = serviceCollection.BuildServiceProvider();

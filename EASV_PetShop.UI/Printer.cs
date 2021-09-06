@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using EASV_PetShop.Core.ApplicationService;
 using EASV_PetShop.Core.Entity;
 
@@ -8,10 +10,10 @@ namespace EASV_PetShop.UI
     {
 
         private readonly ICustomerService _customerService;
+        private readonly IPetService _petService;
+        private readonly IPetTypeService _petTypeService;
         private string[] _currentMenu;
-        //private List<Pet> _pets = new List<Pet>();
-        //private List<PetType> _petTypes = new List<PetType>();
-        
+
         #region stringMenuItems
         
         private readonly string[] _mainMenu =
@@ -46,14 +48,17 @@ namespace EASV_PetShop.UI
 
         #endregion
         
-        public Printer(ICustomerService customerService)
+        public Printer(ICustomerService customerService, IPetService petService, IPetTypeService petTypeService)
         {
             _customerService = customerService;
+            _petService = petService;
+            _petTypeService = petTypeService;
             _currentMenu = _mainMenu;
             InitData();
         }
+
+        #region StartUI
         
-        #region MenuUINavigation
         public void StartUi()
         {
             var selection = ShowMenu(_currentMenu);
@@ -109,7 +114,11 @@ namespace EASV_PetShop.UI
             }
             return selection;
         }
+        
+        #endregion
 
+        #region CustomerMenu
+        
         private void CustomerMenu(int selection)
         {
             Console.Clear();
@@ -120,7 +129,7 @@ namespace EASV_PetShop.UI
                     ListCustomers();
                     break;
                 case 2 :
-                    var foundCustomer = _customerService.FindCustomerById(PrintFindCustomerById());
+                    var foundCustomer = _customerService.FindCustomerById(PrintFindById());
                     Console.WriteLine(foundCustomer.FirstName);
                     break;
                 case 3 :
@@ -133,11 +142,11 @@ namespace EASV_PetShop.UI
                     _customerService.CreateCustomer(customer);
                     break;
                 case 4 :
-                    var id = PrintFindCustomerById();
+                    var id = PrintFindById();
                     _customerService.DeleteCustomer(id);
                     break;
                 case 5 :
-                    var idForEdit = PrintFindCustomerById();
+                    var idForEdit = PrintFindById();
                     var customerToEdit = _customerService.FindCustomerById(idForEdit);
                     Console.WriteLine("Updating " + customerToEdit.FirstName);
                     var newFirsName = AskQuestion("First Name:");
@@ -156,9 +165,15 @@ namespace EASV_PetShop.UI
                     });
                     break;
                 case 6 :
+                    var customerName = AskQuestion("Name:");
+                    ListCustomersByName(customerName);
                     break;
             }
         }
+        
+        #endregion
+
+        #region PetMenu
         
         private void PetMenu(int selection)
         {
@@ -167,24 +182,116 @@ namespace EASV_PetShop.UI
             switch (selection)
             {
                 case 1 :
+                    ListPets();
                     break;
                 case 2 :
+                    ListPetsByType(AskQuestion("Pet Type: "));
                     break;
                 case 3 :
+                    var name = AskQuestion("Name:");
+                    PetType type = _petTypeService.NewPetType(AskQuestion("Pet Type:"));
+                    DateTime birthdate = Convert.ToDateTime(AskQuestion("Birth Date:"));
+                    DateTime soldDate = Convert.ToDateTime(AskQuestion("Sold Date:"));
+                    var color = AskQuestion("Color:");
+                    double price = Convert.ToDouble(AskQuestion("Price:"));
+                    var pet = _petService.NewPet(name,type,birthdate,soldDate,color,price);
+                    _petService.CreatePet(pet);
                     break;
                 case 4 :
+                    var id = PrintFindById();
+                    _petService.DeletePet(id);
                     break;
                 case 5 :
+                    var idForEdit = PrintFindById();
+                    var petToEdit = _petService.FindPetById(idForEdit);
+                    Console.WriteLine("Updating " + petToEdit.Name);
+                    var newName = AskQuestion("Name:");
+                    PetType newPetType = _petTypeService.NewPetType(AskQuestion("Last Name:"));
+                    DateTime newBirthDate = Convert.ToDateTime(AskQuestion("Address:"));
+                    DateTime newSoldDate = Convert.ToDateTime(AskQuestion("Phone Number:"));
+                    var newColor = AskQuestion("Email:");
+                    Double newPrice = Convert.ToDouble(AskQuestion("Email:"));
+                    _petService.UpdatePet(new Pet()
+                    {
+                        Id = idForEdit,
+                        Name = newName,
+                        PetType = newPetType,
+                        BirthDate = newBirthDate,
+                        SoldDate = newSoldDate,
+                        Color = newColor,
+                        Price = newPrice
+                    });
                     break;
                 case 6 :
+                    ListPetsByPrice();
                     break;
                 case 7 :
+                    GetFiveCheapestPets();
                     break;
                         
             }
         }
+
+        private void GetFiveCheapestPets()
+        {
+            Console.WriteLine("\nList Of Five Cheapest Pets:");
+            var pets = _petService.GetAllPetsByPrice();
+            var cheapestPets = new List<Pet>();
+            for (int i = 0; i < 5; i++)
+            {
+                cheapestPets.Add(pets[i]);
+            }
+            
+            foreach (var pet in cheapestPets)
+            {
+                Console.WriteLine($"Id:{pet.Id} Name:{pet.Name} Type:{pet.PetType.Name} "+
+                                  $"Birthdate:{pet.BirthDate} SoldDate:{pet.SoldDate} Color:{pet.Color} Price:{pet.Price}");
+            }
+        }
+
+        #endregion
+
+        #region PetPrinter
+        
+        private void ListPetsByType(string petType)
+        {
+            Console.WriteLine("\nList Of Pets by Type:");
+            var pets = _petService.GetAllPets();
+            foreach (var pet in pets)
+            {
+                if (pet.PetType.Name == petType)
+                {
+                    Console.WriteLine($"Id:{pet.Id} Name:{pet.Name} Type:{pet.PetType.Name} "+
+                                      $"Birthdate:{pet.BirthDate} SoldDate:{pet.SoldDate} Color:{pet.Color} Price:{pet.Price}");
+                }
+            }
+        }
+        
+        private void ListPets()
+        {
+            Console.WriteLine("\nList Of Pets:");
+            var pets = _petService.GetAllPets();
+            foreach (var pet in pets)
+            {
+                Console.WriteLine($"Id:{pet.Id} Name:{pet.Name} Type:{pet.PetType.Name} "+
+                                  $"Birthdate:{pet.BirthDate} SoldDate:{pet.SoldDate} Color:{pet.Color} Price:{pet.Price}");
+            }
+        }
+        
+        private void ListPetsByPrice()
+        {
+            Console.WriteLine("\nList Of Pets:");
+            var pets = _petService.GetAllPetsByPrice();
+            foreach (var pet in pets)
+            {
+                Console.WriteLine($"Id:{pet.Id} Name:{pet.Name} Type:{pet.PetType.Name} "+
+                                  $"Birthdate:{pet.BirthDate} SoldDate:{pet.SoldDate} Color:{pet.Color} Price:{pet.Price}");
+            }
+        }
         
         #endregion
+
+        #region CustomerPrinter
 
         private void ListCustomers()
         {
@@ -196,8 +303,22 @@ namespace EASV_PetShop.UI
                                   $"Customer address:{customer.Address} Email:{customer.Email} Phone number:{customer.PhoneNumber}");
             }
         }
-        
-        private int PrintFindCustomerById()
+
+        private void ListCustomersByName(string name)
+        {
+            Console.WriteLine("\nList Of Customers:");
+            var customers = _customerService.GetAllCustomers();
+            foreach (var customer in customers)
+            {
+                if (customer.FirstName == name)
+                {
+                    Console.WriteLine($"Id:{customer.Id} First Name:{customer.FirstName} Last Name:{customer.LastName} "+
+                                      $"Customer address:{customer.Address} Email:{customer.Email} Phone number:{customer.PhoneNumber}");
+                }
+            }
+        }
+
+        private int PrintFindById()
         {
             Console.WriteLine("Insert Customer Id: ");
             int id;
@@ -208,6 +329,8 @@ namespace EASV_PetShop.UI
 
             return id;
         }
+        
+        #endregion
 
         static string AskQuestion(string question)
         {
@@ -235,6 +358,66 @@ namespace EASV_PetShop.UI
                 Address = "Chris Cross street 41",
                 Email = "Donk@Kong.com",
                 PhoneNumber = "987654321"
+            });
+
+            _petService.CreatePet( new Pet()
+            {
+                Name = "Kaira",
+                PetType = _petTypeService.NewPetType("Vokietis"),
+                BirthDate = Convert.ToDateTime("1999.01.01"),
+                SoldDate = Convert.ToDateTime("1999.02.02"),
+                Color = "Black",
+                Price = 421.20
+            });
+            
+            _petService.CreatePet( new Pet()
+            {
+                Name = "Enzo",
+                PetType = _petTypeService.NewPetType("Atejunas"),
+                BirthDate = Convert.ToDateTime("1999.01.01"),
+                SoldDate = Convert.ToDateTime("1999.02.02"),
+                Color = "Hybrid",
+                Price = 821.20
+            });
+            
+            _petService.CreatePet( new Pet()
+            {
+                Name = "Tidfsgka",
+                PetType = _petTypeService.NewPetType("asd"),
+                BirthDate = Convert.ToDateTime("1999.01.01"),
+                SoldDate = Convert.ToDateTime("1999.02.02"),
+                Color = "Hybrid",
+                Price = 621.20
+            });
+            
+            _petService.CreatePet( new Pet()
+            {
+                Name = "Tisdfgfka",
+                PetType = _petTypeService.NewPetType("Chihhgwsfuaha"),
+                BirthDate = Convert.ToDateTime("1999.01.01"),
+                SoldDate = Convert.ToDateTime("1999.02.02"),
+                Color = "Hybrid",
+                Price = 221.20
+            });
+            
+            _petService.CreatePet( new Pet()
+            {
+                Name = "Tikaa",
+                PetType = _petTypeService.NewPetType("sadfa"),
+                BirthDate = Convert.ToDateTime("1999.01.01"),
+                SoldDate = Convert.ToDateTime("1999.02.02"),
+                Color = "Hybrid",
+                Price = 121.20
+            });
+            
+            _petService.CreatePet( new Pet()
+            {
+                Name = "Tika",
+                PetType = _petTypeService.NewPetType("Chihuaha"),
+                BirthDate = Convert.ToDateTime("1999.01.01"),
+                SoldDate = Convert.ToDateTime("1999.02.02"),
+                Color = "Hybrid",
+                Price = 921.20
             });
         }
         

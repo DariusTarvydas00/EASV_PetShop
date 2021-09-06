@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EASV_PetShop.UI", "EASV_Pet
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EASV_PetShop.Core", "EASV_PetShop.Core\EASV_PetShop.Core.csproj", "{7FBB9F17-C10C-4DED-96A7-AF84B3DE538A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EASC_PetShop.Core.Entity", "EASC_PetShop.Core.Entity\EASC_PetShop.Core.Entity.csproj", "{57E56F7E-244A-483C-AC27-340390787FAE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EASV_PetShop.Core.Entity", "EASV_PetShop.Core.Entity\EASV_PetShop.Core.Entity.csproj", "{57E56F7E-244A-483C-AC27-340390787FAE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EASV_PetShop.Infrastructure.Static.Data", "EASV_PetShop.Infrastructure.Static.Data\EASV_PetShop.Infrastructure.Static.Data.csproj", "{425153E7-8220-40B5-9B15-D18C627026A1}"
 EndProject

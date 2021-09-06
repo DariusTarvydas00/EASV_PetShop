@@ -6,7 +6,7 @@ namespace EASV_PetShop.Core.Entity
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Type PetType { get; set; }
+        public PetType PetType { get; set; }
         public DateTime BirthDate { get; set; }
         public DateTime SoldDate { get; set; }
         public string Color { get; set; }

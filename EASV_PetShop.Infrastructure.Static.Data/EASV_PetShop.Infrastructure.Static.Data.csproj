@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EASC_PetShop.Core.Entity\EASC_PetShop.Core.Entity.csproj" />
+      <ProjectReference Include="..\EASV_PetShop.Core.Entity\EASV_PetShop.Core.Entity.csproj" />
       <ProjectReference Include="..\EASV_PetShop.Core\EASV_PetShop.Core.csproj" />
     </ItemGroup>
 

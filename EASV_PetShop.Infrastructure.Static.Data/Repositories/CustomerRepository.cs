@@ -2,7 +2,7 @@
 using EASV_PetShop.Core.DomainService;
 using EASV_PetShop.Core.Entity;
 
-namespace EASV_PetShop.Infrastructure.Static.Data.Repositories
+namespace ClassLibrary1Infrastructure.Repositories
 {
     public class CustomerRepository: ICustomerRepository
     {

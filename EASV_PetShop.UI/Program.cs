@@ -20,6 +20,9 @@ namespace EASV_PetShop.UI
 
             serviceCollection.AddScoped<IPetTypeRepository, PetTypeRepository>();
             serviceCollection.AddScoped<IPetTypeService, PetTypeService>();
+
+            serviceCollection.AddScoped<IOwnerRepository, OwnerRepository>();
+            serviceCollection.AddScoped<IOwnerService, OwnerSerivce>();
             
             serviceCollection.AddScoped<IPrinter, Printer>();
             
